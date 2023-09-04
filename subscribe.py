@@ -25,7 +25,7 @@ client.on_connect = on_connect
 client.on_message = on_message
 
 # 設定登入帳號密碼
-client.username_pw_set("silva","holy7813")
+# client.username_pw_set("silva","holy7813")
 
 # 設定連線資訊(IP, Port, 連線時間)
 client.connect("127.0.0.1", 1883, 60)
