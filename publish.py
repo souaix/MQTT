@@ -23,5 +23,5 @@ while True:
     payload = {'Temperature' : t0 , 'Time' : t}
     print (json.dumps(payload))
     #要發布的主題和內容
-    client.publish("Try/MQTT", json.dumps(payload))
+    client.publish("test", json.dumps(payload))
     time.sleep(5)
