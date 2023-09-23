@@ -17,10 +17,12 @@ sys.path.append('/home/cim')
 import connect.connect as cc
 
 
-eng_cim = cc.connect('CIM', 'iot')
+eng_cim = cc.connect('CIM_ubuntu', 'iot')
+con = eng_cim.connect()	
+
 sql = "SELECT * FROM co2_iot_list WHERE MQTT = '1'"
 
-co2_list = pd.read_sql_query(sql, con=eng_cim)
+co2_list = pd.read_sql_query(sql, eng_cim)
 
 no_list = co2_list["NO"].tolist()
 
@@ -40,20 +42,25 @@ def connect_mqtt() -> mqtt_client:
 
 async def subscribe(client: mqtt_client,topic):
 	def on_message(client, userdata, msg):
-		print(msg.topic+" " + msg.payload.decode('utf-8'))
-		no = msg.topic.split('/')
-		msg = msg.payload.decode('utf-8')
-		msg = json.loads(msg)
-		val = str(msg["object"][0]["value"][0])
-		print(no[1]+":"+str(val))
-#		time.sleep(5)
-		insert_sql(no[1],val)
+		try:
+			print(msg.topic+" " + msg.payload.decode('utf-8'))
+			no = msg.topic.split('/')
+			if len(no) ==2:
+				msg = msg.payload.decode('utf-8')
+				msg = json.loads(msg)
+				val = str(msg["object"][0]["value"][0])
+				print(no[1]+":"+str(val))
+				insert_sql(no[1],val)
+		except Exception as e:
+			print(E)
 
 	
 	client.subscribe(topic,0)	
 	client.on_message = on_message
 
 	await asyncio.sleep(1)
+	con.close()
+	eng_cim.dispose()
 
 def run(no_list):
 	loop = asyncio.get_event_loop()    
@@ -63,12 +70,13 @@ def run(no_list):
 	tasks = [loop.create_task(subscribe(client,"CO2/"+i)) for i in no_list]
 
 	loop.run_until_complete(asyncio.wait(tasks))
+	eng_cim.dispose()
 #	loop.run_forever()
 #	loop.stop()
 
 
 def insert_sql(no,val):
-	con = eng_cim.connect()	
+	
 	
 	info = co2_list[co2_list["NO"]==no]
 	info = info.reset_index()
@@ -90,12 +98,15 @@ def insert_sql(no,val):
 		sql = "INSERT INTO `co2_history` (`machine`,`source`,`no`,`unit`,`value`,`time`) values ('"+eqp+"','"+source+"','"+no+"','"+unit+"','"+val+"','"+now_time+"')"
 		con.execute(text(sql))
 		con.commit()
+	# con.close()
+
 		
 		
 if __name__ == '__main__':
-
-    run(no_list)
-
+	run(no_list)
+	#eng_cim.dispose()
+	
+	
 
 
     # asyncio.run(run("CO2/No06_10"))
