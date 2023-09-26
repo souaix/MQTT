@@ -10,7 +10,7 @@ def on_connect(client, userdata, flags, rc):
     # arr = ["CO2/No06_10","CO2/No06_07"]
     # client.subscribe(arr)
     # client.subscribe("CO2/No06_07")
-    a = ("CO2/No06_10",0)
+    a = ("LIQ/TEST",0)
     b = ("CO2/No06_07",0)
     arr=[]
     arr.append(a)
