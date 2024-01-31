@@ -91,13 +91,13 @@ def insert_sql(no,val):
 	sql = "INSERT INTO `co2` (`machine`,`source`,`no`,`unit`,`value`,`time`) values 			('"+eqp+"','"+source+"','"+no+"','"+unit+"','"+val+"','"+now_time+"')"
 	
 	con.execute(text(sql))
-	con.commit()
+	#con.commit()
 
 	#記錄每整點log
 	if(now_hour=='00'):
 		sql = "INSERT INTO `co2_history` (`machine`,`source`,`no`,`unit`,`value`,`time`) values ('"+eqp+"','"+source+"','"+no+"','"+unit+"','"+val+"','"+now_time+"')"
 		con.execute(text(sql))
-		con.commit()
+		#con.commit()
 	# con.close()
 
 		
